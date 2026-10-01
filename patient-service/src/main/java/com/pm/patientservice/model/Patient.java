@@ -59,7 +59,7 @@ public class Patient {
         return registeredDate;
     }
 
-    public void setRegisteredDate(LocalDate RegisteredDate) {
+    public void setRegisteredDate(LocalDate registeredDate) {
         this.registeredDate = registeredDate;
     }
 
