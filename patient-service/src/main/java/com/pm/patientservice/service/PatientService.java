@@ -1,12 +1,17 @@
 package com.pm.patientservice.service;
 
+import billing.BillingResponse;
+import billing.BillingServiceGrpc;
 import com.pm.patientservice.dto.PatientRequestDTO;
 import com.pm.patientservice.dto.PatientResponseDTO;
 import com.pm.patientservice.exception.EmailAlreadyExistsException;
 import com.pm.patientservice.exception.PatientNotFoundException;
+import com.pm.patientservice.grpc.BillingServiceGrpcClient;
 import com.pm.patientservice.mapper.PatientMapper;
 import com.pm.patientservice.model.Patient;
 import com.pm.patientservice.repository.PatientRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.DeleteMapping;
 
@@ -17,10 +22,12 @@ import java.util.UUID;
 
 @Service
 public class PatientService {
+    private static final Logger log = LoggerFactory.getLogger(PatientService.class);
     private final PatientRepository patientRepository;
-
-    public  PatientService(PatientRepository _patientRepository){
+    private final BillingServiceGrpcClient billingServiceGrpcClient;
+    public  PatientService(PatientRepository _patientRepository, BillingServiceGrpcClient _billingServiceGrpcClient){
         this.patientRepository = _patientRepository;
+        this.billingServiceGrpcClient =_billingServiceGrpcClient;
     }
 
     public List<PatientResponseDTO> getPatients(){
@@ -33,6 +40,8 @@ public class PatientService {
          throw new EmailAlreadyExistsException("email already exists"+patientRequestDTO.getEmail());
         }
         Patient newPatient = patientRepository.save(PatientMapper.toModel(patientRequestDTO));
+       BillingResponse billingResponse = billingServiceGrpcClient.createBillingAccount(newPatient.getId().toString(),newPatient.getName(),newPatient.getEmail());
+       log.info("billing created {}",billingResponse.getStatus());
         return PatientMapper.toDto(newPatient);
     }
 

@@ -8,8 +8,18 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/patient_db
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
+      BILLING_SERVICE_ADDRESS: billing-service
+      BILLING_SERVICE_GRPC_PORT: 9001
     ports:
       - "4000:4000"
+
+  billing-service:
+    build:
+      context: ./billing-service
+    container_name: billing-service
+    ports:
+      - "4001:4001"
+      - "9001:9001"
 
   postgres:
     image: postgres:16
