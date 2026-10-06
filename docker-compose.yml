@@ -1,5 +1,16 @@
 services:
 
+  api-gateway:
+    build:
+      context: ./api-gateway
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - patient-service
+      - billing-service
+      - analytics-service
+
   patient-service:
     build:
       context: ./patient-service
